@@ -30,7 +30,41 @@ def getInput(test=False):
     f.close()
     return data
 
+def safetyCheck(prevLevel, currLevel, ascending):
+    if ascending != None:
+        if currLevel < prevLevel and ascending:
+            return False, None
+        elif currLevel > prevLevel and not ascending:
+            return False, None 
+    
+    diff = prevLevel - currLevel
+
+    if diff > 0:
+        if (ascending == None or not ascending) and abs(diff) in (1,2,3):
+            return True, False
+        else:
+            return False, None
+    elif diff < 0:
+        if (ascending == None or ascending) and abs(diff) in (1,2,3):
+            return True, True
+        else:
+            return False, None
+    return False, None
+
 rawData = getInput()
 if rawData == None:
     exit(1)
-    
+
+safeCount = 0
+rawData = rawData.split("\n")
+for report in rawData:
+    report = report.split(" ")
+    report = list(map(lambda x: (int(x)), report))
+    dir = None
+    for level in range(1, len(report)):
+        safe, dir = safetyCheck(report[level-1], report[level], dir)
+        if not safe:
+            break
+    if safe:
+        safeCount += 1
+print(safeCount)
